@@ -1,28 +1,63 @@
+// @flow
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { inject, observer } from 'mobx-react';
 
-class App extends Component {
+import { ModalStore as ModalStoreType } from './stores/ModalStore';
+import { TransactionStore as TransactionStoreType } from './stores/TransactionStore';
+import TransactionItem from './components/TransactionItem';
+import AddTransactionModal from './components/AddTransactionModal';
+import EditTransactionModal from './components/EditTransactionModal';
+
+type Props = {
+  ModalStore: ModalStoreType,
+  TransactionStore: TransactionStoreType
+};
+class App extends Component<Props> {
+  componentDidMount() {
+    this.props.TransactionStore.getData();
+  }
+
   render() {
+    const { openModal } = this.props.ModalStore;
+    const { data, total, loading } = this.props.TransactionStore;
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className="bg-light">
+        <div className="container py-5">
+          <h3>Total:</h3>
+          <h1 className="mb-5">
+            {total.toLocaleString('vi-VI', {
+              style: 'currency',
+              currency: 'VND'
+            })}
+          </h1>
+          <div className="d-flex">
+            <button
+              className="btn btn-primary mr-3"
+              onClick={() => {
+                openModal('addTransaction');
+              }}
+            >
+              Add transaction
+            </button>
+            <button className="btn btn-secondary">View reports</button>
+          </div>
+          <hr />
+
+          {loading && (
+            <div className="text-center py-3 text-info">
+              <i className="fas fa-spinner fa-3x fa-spin" />
+            </div>
+          )}
+
+          {data.map((d, index) => (
+            <TransactionItem key={d.id} data={d} />
+          ))}
+        </div>
+        {<AddTransactionModal />}
+        {<EditTransactionModal />}
       </div>
     );
   }
 }
 
-export default App;
+export default inject('ModalStore', 'TransactionStore')(observer(App));
