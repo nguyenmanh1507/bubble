@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 
 import 'react-datepicker/dist/react-datepicker.css';
+
 import { ModalStore as ModalStoreType } from '../../stores/ModalStore';
 import AddTransactionManager from './AddTransactionModalManager';
 

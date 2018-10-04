@@ -14,7 +14,7 @@ type Props = {
 class TransactionItem extends Component<Props> {
   render() {
     const { openModal } = this.props.ModalStore;
-    const { deleteData } = this.props.TransactionStore;
+    const { deleteData, setSelectedTransaction } = this.props.TransactionStore;
     const { data } = this.props;
 
     return (
@@ -43,6 +43,7 @@ class TransactionItem extends Component<Props> {
             <button
               className="btn btn-info mr-3"
               onClick={() => {
+                setSelectedTransaction(data.id);
                 openModal('editTransaction');
               }}
             >

@@ -18,7 +18,7 @@ class App extends Component<Props> {
   }
 
   render() {
-    const { openModal } = this.props.ModalStore;
+    const { openModal, modalName } = this.props.ModalStore;
     const { data, total, loading } = this.props.TransactionStore;
     return (
       <div className="bg-light">
@@ -53,8 +53,8 @@ class App extends Component<Props> {
             <TransactionItem key={d.id} data={d} />
           ))}
         </div>
-        {<AddTransactionModal />}
-        {<EditTransactionModal />}
+        {modalName === 'addTransaction' && <AddTransactionModal />}
+        {modalName === 'editTransaction' && <EditTransactionModal />}
       </div>
     );
   }

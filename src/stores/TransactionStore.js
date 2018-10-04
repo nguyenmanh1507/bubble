@@ -3,14 +3,31 @@ import { decorate, observable, action, runInAction } from 'mobx';
 
 import { db } from '../firebase';
 
+const getTransactionsCollectionName = {
+  development: 'dev-transactions',
+  test: 'test-transactions',
+  production: 'transactions'
+};
+
+const TRANSACTIONS =
+  getTransactionsCollectionName[process.env.NODE_ENV || 'development'];
+
 export class TransactionStore {
   data = [];
   total = 0;
   loading = false;
+  selectedTransaction = {
+    id: '',
+    income: '',
+    type: '',
+    amount: 0,
+    date: '',
+    description: ''
+  };
 
   getData = () => {
     this.loading = true;
-    db.collection('transactions')
+    db.collection(TRANSACTIONS)
       .orderBy('date', 'asc')
       .onSnapshot(snapshot => {
         let newData = [];
@@ -34,7 +51,7 @@ export class TransactionStore {
   };
 
   addData = (value: Object) => {
-    db.collection('transactions')
+    db.collection(TRANSACTIONS)
       .doc()
       .set(value)
       .then(() => {
@@ -46,7 +63,7 @@ export class TransactionStore {
   };
 
   updateData = (id: string, value: Object) => {
-    db.collection('transactions')
+    db.collection(TRANSACTIONS)
       .doc(id)
       .set(value)
       .then(() => {
@@ -58,7 +75,7 @@ export class TransactionStore {
   };
 
   deleteData = (id: string) => {
-    db.collection('transactions')
+    db.collection(TRANSACTIONS)
       .doc(id)
       .delete()
       .then(() => {
@@ -68,13 +85,22 @@ export class TransactionStore {
         console.log('Error when delete new transaction', error);
       });
   };
+
+  setSelectedTransaction = (id: string) => {
+    const selected = this.data.find(d => d.id === id);
+    if (selected) {
+      this.selectedTransaction = selected;
+    }
+  };
 }
 
 decorate(TransactionStore, {
   data: observable,
   loading: observable,
   total: observable,
-  getData: action
+  selectedTransaction: observable,
+  getData: action,
+  setSelectedTransaction: action
 });
 
 export default new TransactionStore();
